@@ -14,11 +14,18 @@ def save_image_to_temp_file(image):
 
 
 def predict_with_multiple_models(image1_path, image2_path):
-    models = ['VGG-Face', 'Facenet', 'OpenFace', 'DeepFace']
+    # models = ['VGG-Face', 'Facenet', 'OpenFace', 'DeepFace', "Facenet512"]
+    models = ["Facenet512"]
     positive_results = 0
+    objs1 = DeepFace.analyze(img_path=image1_path, actions=['age', 'gender', 'race', 'emotion'],)
+    objs2 = DeepFace.analyze(img_path=image2_path, actions=['age', 'gender', 'race', 'emotion'],)
 
+    print(f"First photo analysis output:\n{str(objs1)}")
+    print(f"Second photo analysis output:\n{str(objs2)}")
+    
     for model_name in models:
-        result = DeepFace.verify(image1_path, image2_path, model_name=model_name, enforce_detection=True)
+        result = DeepFace.verify(image1_path, image2_path, model_name=model_name, enforce_detection=True,
+                                 distance_metric="euclidean", detector_backend="mtcnn")
 
         print(f"- The model is {model_name}\n- The model result is {result['verified']}\n{str(result)}\n")
 
