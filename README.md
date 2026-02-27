@@ -1,79 +1,149 @@
+# FacialRecognition
 
-# DeepFace Flask API
+A Python-based real-time facial recognition system implementing face detection and embedding-based identification using computer vision and machine learning techniques.
 
-DeepFace Flask API provides a RESTful interface for facial analysis and verification tasks, utilizing the DeepFace library for deep learning-based face recognition and attribute analysis. This API supports image comparison, verifying identities, and evaluating the precision of the verification process.
+This project demonstrates the full pipeline of biometric recognition, including:
 
-## Features
+- Face detection
+- Feature extraction (face embeddings)
+- Vector comparison
+- Identity classification
 
-- Facial attribute analysis including age, gender, race, and emotion.
-- Face verification to determine if two faces belong to the same person.
-- Precision calculation for verification processes.
+---
 
-## Requirements
+## 🧠 Technical Overview
 
-- Python 3.6+
-- Flask
-- DeepFace
-- scikit-learn
+The system follows a typical face recognition pipeline:
 
-Ensure you have the required dependencies by installing them through `pip`:
+### 1️⃣ Frame Acquisition
+Captures frames from a live webcam stream using OpenCV.
+
+### 2️⃣ Face Detection
+Detects faces within each frame using:
+
+- HOG (Histogram of Oriented Gradients) + Linear SVM  
+or
+- CNN-based detector (depending on implementation)
+
+This step identifies bounding boxes for each detected face.
+
+### 3️⃣ Face Encoding (Feature Extraction)
+
+Each detected face is converted into a fixed-length embedding vector (typically 128-dimensional).
+
+These embeddings are generated using a deep metric learning model trained to map facial features into a vector space where:
+
+- Same person → embeddings are close
+- Different people → embeddings are distant
+
+### 4️⃣ Face Matching
+
+Recognition is performed by computing the distance between:
+
+- The new face embedding
+- Stored known embeddings
+
+Common metric:
+- Euclidean distance
+
+If the distance is below a defined threshold, the identity is considered a match.
+
+---
+
+## 🚀 Features
+
+- Real-time face detection
+- Embedding-based recognition
+- Distance-threshold classification
+- Live webcam processing
+- Bounding box + label rendering
+- Modular and extendable recognition logic
+
+---
+
+## 📦 Requirements
+
+- Python 3.8+
+- OpenCV
+- NumPy
+- face_recognition (if used)
+- dlib (if required by face_recognition)
+
+Install dependencies:
 
 ```bash
-pip install flask deepface sklearn
-```
+pip install opencv-python numpy face_recognition
+````
 
-## Installation
+---
 
-Clone this repository to your local machine:
-
-```bash
-git clone https://github.com/guiziii/FacialRecognition.git
-cd FacialRecognition
-```
-
-Install the required Python packages:
+## ▶️ Running the Project
 
 ```bash
-pip install -r requirements.txt
+python FacialRecognition.py
 ```
 
-## Usage
+The system will:
 
-Start the Flask server by running:
+1. Access your webcam.
+2. Detect faces per frame.
+3. Generate embeddings.
+4. Compare embeddings against stored references.
+5. Display identity results in real time.
 
-```bash
-python app.py
+---
+
+## 📊 Recognition Logic
+
+Example matching logic:
+
+```python
+distance = np.linalg.norm(known_encoding - unknown_encoding)
+
+if distance < threshold:
+    print("Match found")
 ```
 
-The API will be available at `http://localhost:5000`.
+The threshold determines sensitivity:
 
-### Endpoints
+* Lower threshold → stricter matching
+* Higher threshold → more tolerant matching
 
-#### `/predict`
+---
 
-- **Method:** POST
-- **Description:** Compares two images and predicts if they belong to the same person.
-- **Payload:** `multipart/form-data` with two image files named `image1` and `image2`.
+## ⚙️ Performance Considerations
 
-#### `/precision`
+* HOG-based detection → faster, CPU-friendly
+* CNN-based detection → more accurate, GPU recommended
+* Frame resizing improves real-time performance
+* Precomputing known encodings reduces runtime overhead
 
-- **Method:** GET
-- **Description:** Calculates the precision of the face verification process over a predefined set of image pairs and labels.
+---
 
-## Example Requests
+## 🔐 Security & Ethical Notes
 
-You can use tools like `curl` or Postman to interact with the API. Here's an example using `curl`:
+* Facial biometric data must be handled securely.
+* Always comply with local data protection laws (GDPR/LGPD).
+* Do not store facial embeddings without user consent.
 
-```bash
-curl -X POST -F "image1=@path_to_image1.jpg" -F "image2=@path_to_image2.jpg" http://localhost:5000/predict
+---
+
+## 📁 Project Structure
+
+```
+FacialRecognition-main/
+│
+├── FacialRecognition.py   # Main facial recognition pipeline
+└── README.md              # Documentation
 ```
 
-## Contributing
+---
 
-Contributions to the DeepFace Flask API are welcome. Please ensure you follow the provided coding standards and contribute to the existing functionalities.
+## 🏗 Possible Improvements
 
-## License
-
-[MIT License](LICENSE)
-
-Please note that the use of the DeepFace library and other dependencies might be subject to their own licenses.
+* Add dataset management module
+* Implement face alignment preprocessing
+* Store embeddings in a database
+* Replace Euclidean distance with cosine similarity
+* Add REST API interface
+* Deploy as edge device recognition service
